@@ -17,6 +17,11 @@ public class Main
 
     public static void FileReading() throws FileNotFoundException
     {
+        /*ArrayList<String> sVar = new ArrayList<>();
+        ArrayList<String> variables = new ArrayList<>();
+        String line;
+        String[] temp = new String[0];*/
+
         Scanner input = new Scanner(System.in);
 
         System.out.print("What is the name of the CFG file to read from: ");
@@ -48,11 +53,6 @@ public class Main
             outputFileName = outputFileName + ".txt";
         }
 
-        FileScanning(inputReader, outputFileName);
-    }
-
-    public static void FileScanning(Scanner inputReader, String outputFileName) throws FileNotFoundException
-    {
         // creates the output file to write on with the PrintWriter
         File outputFile = new File (outputFileName);
         PrintWriter outputWriter = new PrintWriter(outputFile);
@@ -61,7 +61,7 @@ public class Main
         {
             line = inputReader.nextLine();
 
-            temp = line.split("(?=-), (?=|)");
+            temp = line.split("-", 2);
 
             sVar.add(temp[0].trim());
             variables.add(temp[1].trim());
@@ -72,9 +72,18 @@ public class Main
             String startVar = sVar.get(i);
             String var = variables.get(i);
 
+            outputWriter.println(startVar + "- " + variables);
+
         }
 
         inputReader.close();
         outputWriter.close();
+    }
+
+    public static void FileScanning(Scanner inputReader, String outputFileName) throws FileNotFoundException
+    {
+
+
+
     }
 }
