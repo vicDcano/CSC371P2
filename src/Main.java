@@ -7,8 +7,9 @@ public class Main
     static HashMap<String, List<String>> cfgTable = new HashMap<>();
     static ArrayList<String> sVar = new ArrayList<>();
     static ArrayList<String> variables = new ArrayList<>();
-    static String line;
-    static String[] temp = new String[0];
+    static ArrayList<String> terminals = new ArrayList<>();
+
+    static char[] data;
 
     public static void main(String[] args) throws FileNotFoundException
     {
@@ -27,9 +28,11 @@ public class Main
         System.out.print("What is the name of the CFG file to read from: ");
 
         String inputFileName = input.nextLine();
+
         // if the user inputs the right name and does not add .txt then this adds it to be able to find the file
         if(!inputFileName.contains(".txt"))
         {
+            inputFileName = inputFileName.toUpperCase();
             inputFileName = inputFileName + ".txt";
         }
 
@@ -57,33 +60,39 @@ public class Main
         File outputFile = new File (outputFileName);
         PrintWriter outputWriter = new PrintWriter(outputFile);
 
+        FileScanning(inputReader, outputFile, outputWriter);
+    }
+
+    public static void FileScanning(Scanner inputReader, File outputFile, PrintWriter outputWriter) throws FileNotFoundException
+    {
+
         while(inputReader.hasNext())
         {
-            line = inputReader.nextLine();
+            char[] temp;
 
-            temp = line.split("-", 2);
+            String line = inputReader.nextLine();
 
-            sVar.add(temp[0].trim());
-            variables.add(temp[1].trim());
+            String[] parts = line.split("-");
+
+            String leftHand = parts[0].trim();
+
+            String[] rightHand = parts[1].split("(\\|)");
+
+            sVar.add(leftHand);
+
+            System.out.println(leftHand + "-" + Arrays.toString(rightHand));
+
+            /*sVar.add(String.valueOf(temp[0]).trim());*/
+
         }
 
-        for(int i = 0; i < sVar.size(); i++)
+       /* for(int i = 0; i < sVar.size(); i++)
         {
-            String startVar = sVar.get(i);
-            String var = variables.get(i);
-
-            outputWriter.println(startVar + "- " + variables);
-
-        }
+            System.out.println(sVar.get(i));
+        }*/
 
         inputReader.close();
         outputWriter.close();
-    }
-
-    public static void FileScanning(Scanner inputReader, String outputFileName) throws FileNotFoundException
-    {
-
-
 
     }
 }
