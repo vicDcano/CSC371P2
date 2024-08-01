@@ -60,10 +60,10 @@ public class Main
         File outputFile = new File (outputFileName);
         PrintWriter outputWriter = new PrintWriter(outputFile);
 
-        FileScanning(inputReader, outputFile, outputWriter);
+        FileScanning(inputReader, outputWriter);
     }
 
-    public static void FileScanning(Scanner inputReader, File outputFile, PrintWriter outputWriter) throws FileNotFoundException
+    public static void FileScanning(Scanner inputReader, PrintWriter outputWriter) throws FileNotFoundException
     {
 
         while(inputReader.hasNext())
@@ -80,16 +80,16 @@ public class Main
 
             sVar.add(leftHand);
 
-            System.out.println(leftHand + "-" + Arrays.toString(rightHand));
 
-            /*sVar.add(String.valueOf(temp[0]).trim());*/
 
+            //System.out.println(leftHand + "-" + Arrays.toString(rightHand));
         }
 
-       /* for(int i = 0; i < sVar.size(); i++)
+        for(int i = 0; i < sVar.size(); i++)
         {
-            System.out.println(sVar.get(i));
-        }*/
+            outputWriter.print(sVar.get(i));
+            //outputFile.print(sVar.get(i));
+        }
 
         inputReader.close();
         outputWriter.close();
