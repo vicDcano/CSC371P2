@@ -6,10 +6,9 @@ public class Main
 {
     static HashMap<String, List<String>> cfgTable = new HashMap<>();
     static ArrayList<String> sVar = new ArrayList<>();
-    static ArrayList<String> variables = new ArrayList<>();
-    static ArrayList<String> terminals = new ArrayList<>();
+    static ArrayList<Character> variables = new ArrayList<>();
+    static ArrayList<Character> terminals = new ArrayList<>();
 
-    static char[] data;
 
     public static void main(String[] args) throws FileNotFoundException
     {
@@ -68,8 +67,6 @@ public class Main
 
         while(inputReader.hasNext())
         {
-            char[] temp;
-
             String line = inputReader.nextLine();
 
             String[] parts = line.split("-");
@@ -80,19 +77,104 @@ public class Main
 
             sVar.add(leftHand);
 
-
-
-            //System.out.println(leftHand + "-" + Arrays.toString(rightHand));
-        }
-
-        for(int i = 0; i < sVar.size(); i++)
-        {
-            outputWriter.print(sVar.get(i));
-            //outputFile.print(sVar.get(i));
+            cfgTable.putIfAbsent(leftHand, new ArrayList<>());
+            cfgTable.get(leftHand).addAll(Arrays.asList(rightHand));
         }
 
         inputReader.close();
         outputWriter.close();
+    }
+
+    public static void EpsilonRule()
+    {
+        boolean modify = false;
+
+        for(String key: cfgTable.keySet())
+        {
+            /*System.out.println(key);*/
+            for(String e : cfgTable.get(key))
+            {
+                if(e.equals("0"))
+                {
+                    for(char c: key.toCharArray())
+                    {
+                        if(!variables.contains(c))
+                        {
+                            variables.add(c);
+                        }
+                    }
+                }
+            }
+        }
+
+        while(!modify)
+        {
+            for(String key: cfgTable.keySet())
+            {
+                boolean tempVar = true;
+
+                for(char c : key.toCharArray())
+                {
+                    if(!variables.contains(c))
+                    {
+                        tempVar = false;
+                        break;
+                    }
+                }
+
+                if(tempVar)
+                {
+                    continue;
+                }
+
+                for(String rules: cfgTable.get(key))
+                {
+                    boolean temp2 = true;
+
+                    for(char c: rules.toCharArray())
+                    {
+                        if(!variables.contains(c))
+                        {
+                            temp2 = false;
+                            break;
+                        }
+
+                    }
+
+                    if(temp2)
+                    {
+                        for(char c : key.toCharArray())
+                        {
+                            if(!variables.contains(c))
+                            {
+                                variables.add(c);
+                                modify = true;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        for(String key : cfgTable.keySet())
+        {
+            List<String> newRules = new ArrayList<>();
+
+            for(String var: cfgTable.get(key))
+            {
+                if(!var.equals("0"))
+                {
+                    newRules.add(var);
+                }
+            }
+
+            cfgTable.put(key, newRules);
+        }
+    }
+
+    public static void UselessRule()
+    {
 
     }
 }
