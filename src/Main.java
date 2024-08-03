@@ -77,13 +77,28 @@ public class Main
 
             sVar.add(leftHand);
 
-            cfgTable.putIfAbsent(leftHand, new ArrayList<>());
-            cfgTable.get(leftHand).addAll(Arrays.asList(rightHand));
+            List<String> rightList = new ArrayList<>();
+
+            for( String temp : rightHand)
+            {
+                rightList.add(temp.trim());
+            }
+
+            cfgTable.put(leftHand, rightList);
+        }
+
+        for(String key : sVar)
+        {
+            String values = cfgTable.get(key).toString();
+
+            System.out.println(key + ": " + values);
         }
 
         inputReader.close();
         outputWriter.close();
     }
+
+    
 
     public static void EpsilonRule()
     {
