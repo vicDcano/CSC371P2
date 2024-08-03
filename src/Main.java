@@ -5,8 +5,9 @@ import java.lang.*;
 public class Main
 {
     static HashMap<String, List<String>> cfgTable = new HashMap<>();
+    static HashMap<String, List<String>> variableTable = new HashMap<>();
     static ArrayList<String> sVar = new ArrayList<>();
-    static ArrayList<Character> variables = new ArrayList<>();
+    static ArrayList<String> value = new ArrayList<>();
     static ArrayList<Character> terminals = new ArrayList<>();
 
 
@@ -79,13 +80,15 @@ public class Main
 
             List<String> rightList = new ArrayList<>();
 
-            for( String temp : rightHand)
+            for(String temp : rightHand)
             {
                 rightList.add(temp.trim());
             }
 
             cfgTable.put(leftHand, rightList);
         }
+
+        EpsilonRuleStepOne();
 
         for(String key : sVar)
         {
@@ -94,98 +97,96 @@ public class Main
             System.out.println(key + ": " + values);
         }
 
+        VarTablePopulate();
+
+        //EpsilonRuleStepOne();
+
         inputReader.close();
         outputWriter.close();
     }
 
-    
-
-    public static void EpsilonRule()
+    public static void EpsilonRuleStepOne()
     {
-        boolean modify = false;
+        ArrayList<String> emptySVar = new ArrayList<>();
 
-        for(String key: cfgTable.keySet())
+        for(String key : sVar)
         {
-            /*System.out.println(key);*/
-            for(String e : cfgTable.get(key))
+            ArrayList<String> temp = new ArrayList<>();
+
+            for(String checking : cfgTable.get(key))
             {
-                if(e.equals("0"))
+                if(!checking.equals("0"))
                 {
-                    for(char c: key.toCharArray())
-                    {
-                        if(!variables.contains(c))
-                        {
-                            variables.add(c);
-                        }
-                    }
-                }
-            }
-        }
-
-        while(!modify)
-        {
-            for(String key: cfgTable.keySet())
-            {
-                boolean tempVar = true;
-
-                for(char c : key.toCharArray())
-                {
-                    if(!variables.contains(c))
-                    {
-                        tempVar = false;
-                        break;
-                    }
+                    temp.add(checking);
                 }
 
-                if(tempVar)
+                else
                 {
-                    continue;
-                }
-
-                for(String rules: cfgTable.get(key))
-                {
-                    boolean temp2 = true;
-
-                    for(char c: rules.toCharArray())
-                    {
-                        if(!variables.contains(c))
-                        {
-                            temp2 = false;
-                            break;
-                        }
-
-                    }
-
-                    if(temp2)
-                    {
-                        for(char c : key.toCharArray())
-                        {
-                            if(!variables.contains(c))
-                            {
-                                variables.add(c);
-                                modify = true;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-        for(String key : cfgTable.keySet())
-        {
-            List<String> newRules = new ArrayList<>();
-
-            for(String var: cfgTable.get(key))
-            {
-                if(!var.equals("0"))
-                {
-                    newRules.add(var);
+                    value.add(key);
                 }
             }
 
-            cfgTable.put(key, newRules);
+            if(temp.isEmpty())
+            {
+                emptySVar.add(key);
+            }
+
+            else
+            {
+                cfgTable.put(key, temp);
+            }
+
         }
+
+        for(String key : emptySVar)
+        {
+            cfgTable.remove(key);
+        }
+
+        sVar.removeAll(emptySVar);
+        value.removeAll(emptySVar);
+
+        System.out.print("\n\nThis is marked to have epsilon: ");
+
+        for(String s : value)
+        {
+            System.out.print(s);
+        }
+
+        System.out.println();
+    }
+
+    public static void VarTablePopulate()
+    {
+        for(String key : sVar)
+        {
+            List<String> var = new ArrayList<>();
+
+            for(String checking : cfgTable.get(key))
+            {
+                for(char c : checking.toCharArray())
+                {
+                    String s = String.valueOf(c);
+
+                    if(s.equals(s.toUpperCase()))
+                    {
+                        var.add(s.trim());
+                    }
+                }
+            }
+            variableTable.put(key, var);
+        }
+    }
+
+    public static void EpsRuleStepThree()
+    {
+
+    }
+
+    public static void EpsRuleStepFour()
+    {
+        /*ArrayList<Character>*/
+
     }
 
     public static void UselessRule()
