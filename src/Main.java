@@ -298,17 +298,39 @@ public class Main
 
     public static void EpsRuleStepFour()
     {
-        for (String key : new ArrayList<>(cfgTable.keySet())) {
-            List<String> productions = cfgTable.get(key);
-            List<String> newProductions = new ArrayList<>(productions);
+        ArrayList<String> finalVersion = new ArrayList<>();
 
-            for (String production : productions)
+        for (String key : sVar)
+        {
+            List<String> copyString = cfgTable.get(key);
+            List<String> temp = new ArrayList<>(copyString);
+
+            for (String s : copyString)
             {
-                newProductions.addAll(generateCombinations(production));
+                temp.addAll(makingCombo(s));
+            }
+/*            cfgTable.put(key, temp);*/
+
+            Iterator<String> iteration = temp.iterator();
+
+            while(iteration.hasNext())
+            {
+                String check = iteration.next();
+
+                if(finalVersion.contains(check))
+                {
+                    iteration.remove();
+                }
+
+                else
+                {
+                    finalVersion.add(check);
+                }
             }
 
-            cfgTable.put(key, newProductions);
+            cfgTable.put(key, temp);
         }
+
 
         for(String key : sVar)
         {
@@ -322,59 +344,28 @@ public class Main
         }
     }
 
-    public static List<String> generateCombinations(String production)
+    public static List<String> makingCombo(String copyString)
     {
         List<String> results = new ArrayList<>();
-        results.add(production); // Add the original production
+        results.add(copyString); // Add the original production
 
-        for (int i = 0; i < production.length(); i++)
+        for (int i = 0; i < copyString.length(); i++)
         {
-            char c = production.charAt(i);
-            if (Character.isUpperCase(c) && value.contains(String.valueOf(c)))
+            char c = copyString.charAt(i);
+
+            if (Character.isUpperCase(c))
             {
-                String newProduction = production.substring(0, i) + production.substring(i + 1);
-                if (!results.contains(newProduction))
+                String newValue = copyString.substring(0, i) + copyString.substring(i + 1);
+
+                if (!results.contains(newValue))
                 {
-                    results.add(newProduction);
+                    results.add(newValue);
                 }
             }
         }
 
         return results;
     }
-
-
-    /*public static List<String> comboniations(ArrayList<String> upper, ArrayList<String> lower)
-    {
-        List<String> results = new ArrayList<>();
-        int upperLen = upper.size();
-        int n = 1 << upperLen;
-
-        for (int i = 1; i < n; i++)
-        {
-            StringBuilder sb = new StringBuilder();
-            int upIndex = 0;
-            int lowIndex = 0;
-
-            for (int j = 0; j < n; j++)
-            {
-                if ((i & (1 << j)) != 0)
-                {
-                    sb.append(upper.get(upIndex));
-                }
-
-                else if (lowIndex < lower.size())
-                {
-                    sb.append(lower.get(lowIndex++));
-                }
-
-                upIndex++;
-            }
-            results.add(sb.toString());
-        }
-
-        return results;
-    }*/
 
     public static void UselessRule()
     {
