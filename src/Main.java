@@ -89,17 +89,22 @@ public class Main
         }
 
         EpsilonRuleStepOne();
+        VarTablePopulate();
+        EpsRuleStepThree();
 
         for(String key : sVar)
         {
-            String values = cfgTable.get(key).toString();
-
-            System.out.println(key + ": " + values);
+            System.out.print(key + ": " + cfgTable.get(key) + "\n");
         }
 
-        VarTablePopulate();
+        for(String key : sVar)
+        {
+            System.out.print(key + ": " + variableTable.get(key) + "\n");
+        }
 
-        //EpsilonRuleStepOne();
+        System.out.println("\nStep 4 results\n");
+
+        EpsRuleStepFour();
 
         inputReader.close();
         outputWriter.close();
@@ -146,14 +151,6 @@ public class Main
         sVar.removeAll(emptySVar);
         value.removeAll(emptySVar);
 
-        System.out.print("\n\nThis is marked to have epsilon: ");
-
-        for(String s : value)
-        {
-            System.out.print(s);
-        }
-
-        System.out.println();
     }
 
     public static void VarTablePopulate()
@@ -174,20 +171,210 @@ public class Main
                     }
                 }
             }
+
             variableTable.put(key, var);
         }
     }
 
     public static void EpsRuleStepThree()
     {
+        ArrayList<String> targetValues = new ArrayList<>(value);
+
+        boolean anyChangesMade = false;
+
+        while(!anyChangesMade)
+        {
+            ArrayList<String> copyVar = new ArrayList<>(targetValues);
+
+            for (String state : targetValues)
+            {
+                List<String> result = calE(state);
+
+                for (String s : result)
+                {
+                    if (!copyVar.contains(s))
+                    {
+                        copyVar.add(s);
+                        anyChangesMade = true;
+                    }
+                }
+            }
+
+            targetValues = copyVar;
+
+            for(int i = 0; i < copyVar.size(); i++)
+            {
+                for (String s : value)
+                {
+                    if (!copyVar.get(i).equals(s))
+                    {
+                        targetValues.remove(i);
+                    }
+                }
+            }
+        }
+
+        value.addAll(targetValues);
+
+        System.out.println();
 
     }
+
+    public static List<String> calE(String q)
+    {
+        List<String> result = new ArrayList<>();
+        List<String> transition = variableTable.get(q);
+
+        for(String s : transition)
+        {
+            for (String string : value)
+            {
+                if(!string.equals(s) && !result.contains(s))
+                {
+                    result.add(s);
+                }
+            }
+        }
+
+        return result;
+    }
+
+   /* public static void EpsRuleStepFour()
+    {
+        ArrayList<String> upper = new ArrayList<>();
+        ArrayList<String> lower = new ArrayList<>();
+
+        ArrayList<String> newCNFCom = new ArrayList<>();
+
+        for(String key : value)
+        {
+            for(String s : cfgTable.get(key))
+            {
+                newCNFCom.add(s);
+                char[] temp = s.toCharArray();
+
+                for(char c: temp)
+                {
+                    String sample = String.valueOf(c);
+
+                    if(sample.equals(sample.toUpperCase()) && value.contains(sample))
+                    {
+                        upper.add(sample);
+                    }
+
+                    else
+                    {
+                        lower.add(sample);
+                    }
+                }
+
+                //List<String> combo = comboniations(upper, lower);
+
+                List<String> combo = generateCombinations(upper, lower);
+
+                for(String checking : combo)
+                {
+                    if(!newCNFCom.contains(checking))
+                    {
+                        newCNFCom.add(checking);
+                    }
+                }
+
+                newCNFCom.addAll(combo);
+            }
+        }
+
+        for(String key : value)
+        {
+            System.out.println("The new " + key + ": ");
+
+            for (String s : newCNFCom)
+            {
+                System.out.print(s + " ");
+            }
+        }
+
+    }*/
 
     public static void EpsRuleStepFour()
     {
-        /*ArrayList<Character>*/
+        for (String key : new ArrayList<>(cfgTable.keySet())) {
+            List<String> productions = cfgTable.get(key);
+            List<String> newProductions = new ArrayList<>(productions);
 
+            for (String production : productions)
+            {
+                newProductions.addAll(generateCombinations(production));
+            }
+
+            cfgTable.put(key, newProductions);
+        }
+
+        for(String key : sVar)
+        {
+            System.out.print("The new " + key + ": ");
+
+            for (String s :cfgTable.get(key))
+            {
+                System.out.print(s + " ");
+            }
+            System.out.println();
+        }
     }
+
+    public static List<String> generateCombinations(String production)
+    {
+        List<String> results = new ArrayList<>();
+        results.add(production); // Add the original production
+
+        for (int i = 0; i < production.length(); i++)
+        {
+            char c = production.charAt(i);
+            if (Character.isUpperCase(c) && value.contains(String.valueOf(c)))
+            {
+                String newProduction = production.substring(0, i) + production.substring(i + 1);
+                if (!results.contains(newProduction))
+                {
+                    results.add(newProduction);
+                }
+            }
+        }
+
+        return results;
+    }
+
+
+    /*public static List<String> comboniations(ArrayList<String> upper, ArrayList<String> lower)
+    {
+        List<String> results = new ArrayList<>();
+        int upperLen = upper.size();
+        int n = 1 << upperLen;
+
+        for (int i = 1; i < n; i++)
+        {
+            StringBuilder sb = new StringBuilder();
+            int upIndex = 0;
+            int lowIndex = 0;
+
+            for (int j = 0; j < n; j++)
+            {
+                if ((i & (1 << j)) != 0)
+                {
+                    sb.append(upper.get(upIndex));
+                }
+
+                else if (lowIndex < lower.size())
+                {
+                    sb.append(lower.get(lowIndex++));
+                }
+
+                upIndex++;
+            }
+            results.add(sb.toString());
+        }
+
+        return results;
+    }*/
 
     public static void UselessRule()
     {
