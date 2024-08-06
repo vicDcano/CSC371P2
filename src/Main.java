@@ -8,7 +8,8 @@ public class Main
     static HashMap<String, List<String>> variableTable = new HashMap<>();
     static ArrayList<String> sVar = new ArrayList<>();
     static ArrayList<String> value = new ArrayList<>();
-    static ArrayList<Character> terminals = new ArrayList<>();
+    static ArrayList<String> terminateVariable = new ArrayList<>();
+    static ArrayList<String> uselessValue = new ArrayList<>();
 
 
     public static void main(String[] args) throws FileNotFoundException
@@ -18,10 +19,6 @@ public class Main
 
     public static void FileReading() throws FileNotFoundException
     {
-        /*ArrayList<String> sVar = new ArrayList<>();
-        ArrayList<String> variables = new ArrayList<>();
-        String line;
-        String[] temp = new String[0];*/
 
         Scanner input = new Scanner(System.in);
 
@@ -90,21 +87,30 @@ public class Main
 
         EpsilonRuleStepOne();
         VarTablePopulate();
+        dealingDeletedSVar();
         EpsRuleStepThree();
+        removeValue();
+
+
+        System.out.println("Step 4 results: ");
+
+        EpsRuleStepFour();
 
         for(String key : sVar)
         {
             System.out.print(key + ": " + cfgTable.get(key) + "\n");
         }
 
-        for(String key : sVar)
+        UselessRuleStepOne();
+
+        System.out.print("This is the variables we got ");
+
+        for(String s : uselessValue)
         {
-            System.out.print(key + ": " + variableTable.get(key) + "\n");
+            System.out.print(s + " ");
         }
 
-        System.out.println("\nStep 4 results\n");
-
-        EpsRuleStepFour();
+        System.out.print("\n");
 
         inputReader.close();
         outputWriter.close();
@@ -125,7 +131,7 @@ public class Main
                     temp.add(checking);
                 }
 
-                else
+                else if(!value.contains(key))
                 {
                     value.add(key);
                 }
@@ -133,6 +139,7 @@ public class Main
 
             if(temp.isEmpty())
             {
+                terminateVariable.add(key);
                 emptySVar.add(key);
             }
 
@@ -150,7 +157,6 @@ public class Main
 
         sVar.removeAll(emptySVar);
         value.removeAll(emptySVar);
-
     }
 
     public static void VarTablePopulate()
@@ -175,16 +181,48 @@ public class Main
 
             variableTable.put(key, var);
         }
+
     }
+
+    public static void dealingDeletedSVar()
+    {
+        for(String key : cfgTable.keySet())
+        {
+            List<String> newVarSets = new ArrayList<>();
+
+            for(String temp : cfgTable.get(key))
+            {
+                StringBuilder sb = new StringBuilder();
+
+                for(char c : temp.toCharArray())
+                {
+                    if(!terminateVariable.contains(String.valueOf(c)))
+                    {
+                        sb.append(c);
+                    }
+                }
+
+                if(!sb.isEmpty())
+                {
+                    newVarSets.add(sb.toString());
+                }
+            }
+
+            cfgTable.put(key, newVarSets);
+        }
+    }
+
 
     public static void EpsRuleStepThree()
     {
         ArrayList<String> targetValues = new ArrayList<>(value);
 
-        boolean anyChangesMade = false;
+        boolean anyChangesMade = true;
 
-        while(!anyChangesMade)
+        while(anyChangesMade)
         {
+            anyChangesMade = false;
+
             ArrayList<String> copyVar = new ArrayList<>(targetValues);
 
             for (String state : targetValues)
@@ -202,37 +240,37 @@ public class Main
             }
 
             targetValues = copyVar;
-
-            for(int i = 0; i < copyVar.size(); i++)
-            {
-                for (String s : value)
-                {
-                    if (!copyVar.get(i).equals(s))
-                    {
-                        targetValues.remove(i);
-                    }
-                }
-            }
         }
 
-        value.addAll(targetValues);
 
-        System.out.println();
+        for(String val : targetValues)
+        {
+            if(!value.contains(val))
+            {
+                value.add(val);
+            }
 
+            else if(!value.contains("S"))
+            {
+                value.add(sVar.get(0));
+            }
+        }
     }
 
     public static List<String> calE(String q)
     {
         List<String> result = new ArrayList<>();
-        List<String> transition = variableTable.get(q);
 
-        for(String s : transition)
+        if(variableTable.containsKey(q))
         {
-            for (String string : value)
+            List<String> transition = variableTable.get(q);
+
+            for(String s: transition)
             {
-                if(!string.equals(s) && !result.contains(s))
+                if(!value.contains(s) && !result.contains(s))
                 {
                     result.add(s);
+                    result.addAll(calE(s));
                 }
             }
         }
@@ -240,21 +278,39 @@ public class Main
         return result;
     }
 
+    public static void removeValue()
+    {
+        for(String v : terminateVariable)
+        {
+            if(value.contains(v))
+            {
+                value.remove(v);
+            }
+        }
+    }
+
     public static void EpsRuleStepFour()
     {
-        for (String key : cfgTable.keySet())
+        for (String key : value)
         {
             List<String> copyString = cfgTable.get(key);
             List<String> temp = new ArrayList<>();
 
             for (String s : copyString)
             {
-                temp.addAll(makingCombo(s));
+                List<String> combo = makingCombo(s);
+
+                for(String t : combo)
+                {
+                    if(!temp.contains(t))
+                    {
+                        temp.add(t);
+                    }
+                }
             }
 
             cfgTable.put(key, temp);
         }
-
     }
 
     public static List<String> makingCombo(String copyString)
@@ -277,11 +333,53 @@ public class Main
             }
         }
 
+        results.removeIf(String::isEmpty);
+
         return results;
     }
 
-    public static void UselessRule()
+    public static void UselessRuleStepOne()
     {
+        uselessValue.add("0");
 
+        List<String> gathering = new ArrayList<>();
+
+        for(String key : sVar)
+        {
+            List<String> temp = new ArrayList<>(cfgTable.get(key));
+
+            for(String checking : temp)
+            {
+                for(char c : checking.toCharArray())
+                {
+                    String s = String.valueOf(c);
+
+                    if(s.equals(s.toLowerCase()))
+                    {
+                        gathering.add(s.trim());
+                    }
+                }
+            }
+        }
+
+        removeDups(gathering);
+    }
+
+    public static void removeDups(List<String> gathering)
+    {
+        List<String> temp = new ArrayList<>(gathering);
+
+        for(String s : temp)
+        {
+            if(!uselessValue.contains(s))
+            {
+                uselessValue.add(s);
+            }
+        }
+    }
+
+    public static void uselessRuleStepThree()
+    {
+        
     }
 }
