@@ -110,7 +110,31 @@ public class Main
             System.out.print(s + " ");
         }
 
+        System.out.println();
+
+        System.out.println("This is what Variable table has: ");
+
+        for(String key : variableTable.keySet())
+        {
+            System.out.print(key + ": ");
+            for(String s : variableTable.get(key))
+            {
+                System.out.print(s + " ");
+            }
+
+            System.out.println();
+        }
+
         System.out.print("\n");
+
+        uselessRuleStepThree();
+
+        System.out.println("Deleted Termination  useless");
+
+        for(String key : sVar)
+        {
+            System.out.print(key + ": " + cfgTable.get(key) + "\n");
+        }
 
         inputReader.close();
         outputWriter.close();
@@ -380,6 +404,41 @@ public class Main
 
     public static void uselessRuleStepThree()
     {
-        
+        terminateVariable.clear();
+
+        for (Map.Entry<String, List<String>> entry : cfgTable.entrySet())
+        {
+            if (entry.getValue().size() == 1)
+            {
+                terminateVariable.add(entry.getKey());
+            }
+        }
+
+        eliminationUseless();
+    }
+
+    public static void eliminationUseless()
+    {
+        for(String key : cfgTable.keySet())
+        {
+            List<String> newVarSets = new ArrayList<>();
+
+            for(String temp : cfgTable.get(key))
+            {
+                StringBuilder sb = new StringBuilder();
+
+                if(terminateVariable.contains(temp))
+                {
+                    sb.append(temp);
+                }
+
+                if(!sb.isEmpty())
+                {
+                    newVarSets.add(sb.toString());
+                }
+            }
+
+            cfgTable.put(key, newVarSets);
+        }
     }
 }
