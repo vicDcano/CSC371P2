@@ -158,8 +158,9 @@ public class Main
         for(String key : sVar)
         {
             List<String> var = new ArrayList<>();
+            List<String> temp = new ArrayList<>(cfgTable.get(key));
 
-            for(String checking : cfgTable.get(key))
+            for(String checking : temp)
             {
                 for(char c : checking.toCharArray())
                 {
@@ -239,109 +240,21 @@ public class Main
         return result;
     }
 
-   /* public static void EpsRuleStepFour()
-    {
-        ArrayList<String> upper = new ArrayList<>();
-        ArrayList<String> lower = new ArrayList<>();
-
-        ArrayList<String> newCNFCom = new ArrayList<>();
-
-        for(String key : value)
-        {
-            for(String s : cfgTable.get(key))
-            {
-                newCNFCom.add(s);
-                char[] temp = s.toCharArray();
-
-                for(char c: temp)
-                {
-                    String sample = String.valueOf(c);
-
-                    if(sample.equals(sample.toUpperCase()) && value.contains(sample))
-                    {
-                        upper.add(sample);
-                    }
-
-                    else
-                    {
-                        lower.add(sample);
-                    }
-                }
-
-                //List<String> combo = comboniations(upper, lower);
-
-                List<String> combo = generateCombinations(upper, lower);
-
-                for(String checking : combo)
-                {
-                    if(!newCNFCom.contains(checking))
-                    {
-                        newCNFCom.add(checking);
-                    }
-                }
-
-                newCNFCom.addAll(combo);
-            }
-        }
-
-        for(String key : value)
-        {
-            System.out.println("The new " + key + ": ");
-
-            for (String s : newCNFCom)
-            {
-                System.out.print(s + " ");
-            }
-        }
-
-    }*/
-
     public static void EpsRuleStepFour()
     {
-        ArrayList<String> finalVersion = new ArrayList<>();
-
-        for (String key : sVar)
+        for (String key : cfgTable.keySet())
         {
             List<String> copyString = cfgTable.get(key);
-            List<String> temp = new ArrayList<>(copyString);
+            List<String> temp = new ArrayList<>();
 
             for (String s : copyString)
             {
                 temp.addAll(makingCombo(s));
             }
-/*            cfgTable.put(key, temp);*/
-
-            Iterator<String> iteration = temp.iterator();
-
-            while(iteration.hasNext())
-            {
-                String check = iteration.next();
-
-                if(finalVersion.contains(check))
-                {
-                    iteration.remove();
-                }
-
-                else
-                {
-                    finalVersion.add(check);
-                }
-            }
 
             cfgTable.put(key, temp);
         }
 
-
-        for(String key : sVar)
-        {
-            System.out.print("The new " + key + ": ");
-
-            for (String s :cfgTable.get(key))
-            {
-                System.out.print(s + " ");
-            }
-            System.out.println();
-        }
     }
 
     public static List<String> makingCombo(String copyString)
@@ -359,7 +272,7 @@ public class Main
 
                 if (!results.contains(newValue))
                 {
-                    results.add(newValue);
+                    results.addAll(makingCombo(newValue));
                 }
             }
         }

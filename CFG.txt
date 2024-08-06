@@ -1,5 +1,5 @@
-S-aA|aBB
-A-aaA|bB|abC|0
+S-aA|aBBa
+A-aaA|bB|abCbB|0
 B-b
 C-B
 D-0
