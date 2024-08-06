@@ -260,7 +260,7 @@ public class Main
     public static List<String> makingCombo(String copyString)
     {
         List<String> results = new ArrayList<>();
-        results.add(copyString); // Add the original production
+        results.add(copyString);
 
         for (int i = 0; i < copyString.length(); i++)
         {
