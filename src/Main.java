@@ -127,7 +127,9 @@ public class Main
 
         System.out.print("\n");
 
-        uselessRuleStepThree();
+        uselessRule();
+
+        System.out.println();
 
         System.out.println("Deleted Termination  useless");
 
@@ -402,43 +404,149 @@ public class Main
         }
     }
 
-    public static void uselessRuleStepThree()
+    public static void uselessRule()
+    {
+        boolean changesMade;
+
+        do {
+            changesMade = false;
+
+            List<String> usingVar = new ArrayList<>();
+
+            for (String key : sVar)
+            {
+                for (String s : cfgTable.get(key))
+                {
+                    boolean checking = true;
+
+                    for (char c : s.toCharArray())
+                    {
+                        if (Character.isUpperCase(c) && !usingVar.contains(String.valueOf(c)))
+                        {
+                            checking = false;
+                            break;
+                        }
+                    }
+
+                    if (checking)
+                    {
+                        usingVar.add(key);
+                        break;
+                    }
+                }
+            }
+
+            List<String> removingkey = new ArrayList<>();
+
+            for (String key : sVar)
+            {
+                if (!usingVar.contains(key))
+                {
+                    removingkey.add(key);
+                }
+
+                else
+                {
+                    List<String> newProductions = new ArrayList<>();
+
+                    for (String production : cfgTable.get(key))
+                    {
+                        boolean beingUsed = true;
+
+                        for (char c : production.toCharArray())
+                        {
+                            if (Character.isUpperCase(c) && !usingVar.contains(String.valueOf(c)))
+                            {
+                                beingUsed = false;
+                                break;
+                            }
+                        }
+
+                        if (beingUsed)
+                        {
+                            newProductions.add(production);
+                        }
+                    }
+
+                    if (newProductions.isEmpty())
+                    {removingkey.add(key);
+                    }
+                    else
+                    {
+                        cfgTable.put(key, newProductions);
+                    }
+                }
+            }
+
+            for (String key : removingkey)
+            {
+                cfgTable.remove(key);
+                sVar.remove(key);
+                changesMade = true;
+            }
+        } while (changesMade);
+    }
+
+/*    public static void uselessRuleStepThree()
     {
         terminateVariable.clear();
 
-        for (Map.Entry<String, List<String>> entry : cfgTable.entrySet())
+        for(Map.Entry<String, List<String>> entry : cfgTable.entrySet())
         {
-            if (entry.getValue().size() == 1)
+            if(entry.getValue().size() == 1)
             {
-                terminateVariable.add(entry.getKey());
+                String temp = entry.getKey();
+
+                if(temp.contains(temp.toUpperCase()))
+                {
+                    terminateVariable.add(entry.getKey());
+                    eliminationUseless();
+                }
             }
         }
 
-        eliminationUseless();
+        //eliminationUseless();
     }
 
     public static void eliminationUseless()
     {
+        List<String> foundNewState = new ArrayList<>();
+
         for(String key : cfgTable.keySet())
         {
             List<String> newVarSets = new ArrayList<>();
 
             for(String temp : cfgTable.get(key))
             {
-                StringBuilder sb = new StringBuilder();
+                boolean checking = false;
 
-                if(terminateVariable.contains(temp))
+                for(char c : temp.toCharArray())
                 {
-                    sb.append(temp);
+                    if(terminateVariable.contains(String.valueOf(c)))
+                    {
+                        foundNewState.add(key);
+                        checking = true;
+                        break;
+                    }
                 }
 
-                if(!sb.isEmpty())
+                if(!checking)
                 {
-                    newVarSets.add(sb.toString());
+                    newVarSets.add(temp);
                 }
             }
 
             cfgTable.put(key, newVarSets);
         }
-    }
+
+        terminateVariable.addAll(foundNewState);
+
+        System.out.println("This is the value to terminate ");
+
+        for(String s : terminateVariable)
+        {
+            System.out.print(s + " ");
+        }
+    }*/
+
 }
