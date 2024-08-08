@@ -1,3 +1,4 @@
-S: S-ASA|SA|A|S|AA|AS|aB|a
-A: A-B|S
-B: B-b
+S-BaaB|aaB|aa|Baa|CcaA|caA|ca|Cca|CA|A|C|ABC|BC|B|AC|AB
+A-aabC|aab|BC|C|B|aSa|aa|S
+B-CBA|BA|A|B|CA|C|CB|AaA|aA|a|Aa|CbC|bC|b|Cb|c
+C-BbbB|bbB|bb|Bbb|a|c|A

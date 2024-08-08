@@ -94,7 +94,7 @@ public class Main
         EpsRuleStepFour();
         UselessRuleStepOne();
         uselessRule();
-        printresults(inputReader, outputWriter); // Results to be printed here
+        printResults(inputReader, outputWriter); // Results to be printed here
     }
 
     /*
@@ -306,12 +306,13 @@ public class Main
      */
     public static void EpsRuleStepFour()
     {
-        for (String key : value)
+
+        for(String key : value)
         {
             List<String> copyString = cfgTable.get(key);
             List<String> temp = new ArrayList<>();
 
-            for (String s : copyString)
+            for(String s : copyString)
             {
                 List<String> combo = makingCombo(s);
 
@@ -338,15 +339,15 @@ public class Main
         List<String> results = new ArrayList<>();
         results.add(copyString);
 
-        for (int i = 0; i < copyString.length(); i++)
+        for(int i = 0; i < copyString.length(); i++)
         {
             char c = copyString.charAt(i);
 
-            if (Character.isUpperCase(c))
+            if(Character.isUpperCase(c))
             {
                 String newValue = copyString.substring(0, i) + copyString.substring(i + 1);
 
-                if (!results.contains(newValue))
+                if(!results.contains(newValue))
                 {
                     results.addAll(makingCombo(newValue));
                 }
@@ -411,27 +412,27 @@ public class Main
     {
         boolean changesMade;
 
-        do {
+        do{
             changesMade = false;
 
             List<String> usingVar = new ArrayList<>();
 
-            for (String key : sVar)
+            for(String key : sVar)
             {
-                for (String s : cfgTable.get(key))
+                for(String s : cfgTable.get(key))
                 {
                     boolean checking = true;
 
                     for (char c : s.toCharArray())
                     {
-                        if (Character.isUpperCase(c) && !usingVar.contains(String.valueOf(c)))
+                        if(Character.isUpperCase(c) && !usingVar.contains(String.valueOf(c)))
                         {
                             checking = false;
                             break;
                         }
                     }
 
-                    if (checking)
+                    if(checking)
                     {
                         usingVar.add(key);
                         break;
@@ -441,9 +442,9 @@ public class Main
 
             List<String> removingKey = new ArrayList<>();
 
-            for (String key : sVar)
+            for(String key : sVar)
             {
-                if (!usingVar.contains(key))
+                if(!usingVar.contains(key))
                 {
                     removingKey.add(key);
                 }
@@ -452,11 +453,11 @@ public class Main
                 {
                     List<String> newSetTerms = new ArrayList<>();
 
-                    for (String production : cfgTable.get(key))
+                    for(String production : cfgTable.get(key))
                     {
                         boolean beingUsed = true;
 
-                        for (char c : production.toCharArray())
+                        for(char c : production.toCharArray())
                         {
                             if (Character.isUpperCase(c) && !usingVar.contains(String.valueOf(c)))
                             {
@@ -465,13 +466,13 @@ public class Main
                             }
                         }
 
-                        if (beingUsed)
+                        if(beingUsed)
                         {
                             newSetTerms.add(production);
                         }
                     }
 
-                    if (newSetTerms.isEmpty())
+                    if(newSetTerms.isEmpty())
                     {
                         removingKey.add(key);
                     }
@@ -494,7 +495,7 @@ public class Main
     }
 
     // Prints the results into the text file
-    public static void printresults(Scanner inputReader, PrintWriter outputWriter)
+    public static void printResults(Scanner inputReader, PrintWriter outputWriter)
     {
 
         for(String key : sVar)
