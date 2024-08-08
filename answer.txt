@@ -1,0 +1,3 @@
+S: S-ASA|SA|A|S|AA|AS|aB|a
+A: A-B|S
+B: B-b

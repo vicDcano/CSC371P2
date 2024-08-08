@@ -60,9 +60,10 @@ public class Main
         FileScanning(inputReader, outputWriter);
     }
 
-    public static void FileScanning(Scanner inputReader, PrintWriter outputWriter) throws FileNotFoundException
+    public static void FileScanning(Scanner inputReader, PrintWriter outputWriter)
     {
 
+        // Taking the text file and populate it into the cfgtable hashmap and start value to the arraylist
         while(inputReader.hasNext())
         {
             String line = inputReader.nextLine();
@@ -90,58 +91,16 @@ public class Main
         dealingDeletedSVar();
         EpsRuleStepThree();
         removeValue();
-
-
-        System.out.println("Step 4 results: ");
-
         EpsRuleStepFour();
-
-        for(String key : sVar)
-        {
-            System.out.print(key + ": " + cfgTable.get(key) + "\n");
-        }
-
         UselessRuleStepOne();
-
-        System.out.print("This is the variables we got ");
-
-        for(String s : uselessValue)
-        {
-            System.out.print(s + " ");
-        }
-
-        System.out.println();
-
-        System.out.println("This is what Variable table has: ");
-
-        for(String key : variableTable.keySet())
-        {
-            System.out.print(key + ": ");
-            for(String s : variableTable.get(key))
-            {
-                System.out.print(s + " ");
-            }
-
-            System.out.println();
-        }
-
-        System.out.print("\n");
-
         uselessRule();
-
-        System.out.println();
-
-        System.out.println("Deleted Termination  useless");
-
-        for(String key : sVar)
-        {
-            System.out.print(key + ": " + cfgTable.get(key) + "\n");
-        }
-
-        inputReader.close();
-        outputWriter.close();
+        printresults(inputReader, outputWriter); // Results to be printed here
     }
 
+    /*
+        Goes into the cfg table and identify the epsilon empty on the right hand side
+        takes note where they were at that and saved the ones who had it to only modify them in the next function
+     */
     public static void EpsilonRuleStepOne()
     {
         ArrayList<String> emptySVar = new ArrayList<>();
@@ -185,6 +144,10 @@ public class Main
         value.removeAll(emptySVar);
     }
 
+    /*
+        Gets every variable on each starting variable to place them in a variable table
+        to be later used for CalE function
+     */
     public static void VarTablePopulate()
     {
         for(String key : sVar)
@@ -209,6 +172,12 @@ public class Main
         }
 
     }
+
+    /*
+    This function deals with deleting starting value when needed to for having null value or anything
+    then it goes threw the entire the starting value content and deletes the string that has that starting value
+    we need to delete the starting value and anything associated with all the starting value
+     */
 
     public static void dealingDeletedSVar()
     {
@@ -238,7 +207,12 @@ public class Main
         }
     }
 
-
+    /*
+        populate the value and use CalE to do step three of Epsilon rule
+        get the value of who recursively together and connected
+        then add the S as it is the value that is need to be used to due to epsilon rule
+        and adds them to the terminating value function to delete the unused variables
+     */
     public static void EpsRuleStepThree()
     {
         ArrayList<String> targetValues = new ArrayList<>(value);
@@ -283,6 +257,12 @@ public class Main
         }
     }
 
+    /*
+        CalE function to recursively on each starting value
+        and it sees if another variable is there and not a terminal value
+        then goes to that next starting value to see if another variable is there and continues the cycle
+        till it finds all the variables needed
+     */
     public static List<String> calE(String q)
     {
         List<String> result = new ArrayList<>();
@@ -304,6 +284,9 @@ public class Main
         return result;
     }
 
+    /*
+        deletes the variables that are in the list
+     */
     public static void removeValue()
     {
         for(String v : terminateVariable)
@@ -315,6 +298,12 @@ public class Main
         }
     }
 
+    /*
+        The final step of the epsilon rule of making new combinations for each starting values
+        it calls the function to do more work of making the combinations
+        making a variety of combinations with the Variables and terminals
+        making the variables into 1 or 0 and ignores the terminals
+     */
     public static void EpsRuleStepFour()
     {
         for (String key : value)
@@ -339,6 +328,11 @@ public class Main
         }
     }
 
+    /*
+        this is the function that will turn the variables into a 0 or 1
+        making different combinations fo the starting values that need to make changes
+        to fulfill the epsilon rule
+     */
     public static List<String> makingCombo(String copyString)
     {
         List<String> results = new ArrayList<>();
@@ -364,6 +358,10 @@ public class Main
         return results;
     }
 
+    /*
+        Follows the rule of Useless rule of step one of adding the epsilon and the terminal values
+        putting them into an Arraylist and save it for later
+     */
     public static void UselessRuleStepOne()
     {
         uselessValue.add("0");
@@ -391,6 +389,7 @@ public class Main
         removeDups(gathering);
     }
 
+    // removes the terminal duplicates that appears in the arraylist
     public static void removeDups(List<String> gathering)
     {
         List<String> temp = new ArrayList<>(gathering);
@@ -404,6 +403,10 @@ public class Main
         }
     }
 
+    /*
+        Does the rest of the Useless rule of going threw deleting values that are not reached,
+        that are infinite looping because of useless rule
+     */
     public static void uselessRule()
     {
         boolean changesMade;
@@ -436,18 +439,18 @@ public class Main
                 }
             }
 
-            List<String> removingkey = new ArrayList<>();
+            List<String> removingKey = new ArrayList<>();
 
             for (String key : sVar)
             {
                 if (!usingVar.contains(key))
                 {
-                    removingkey.add(key);
+                    removingKey.add(key);
                 }
 
                 else
                 {
-                    List<String> newProductions = new ArrayList<>();
+                    List<String> newSetTerms = new ArrayList<>();
 
                     for (String production : cfgTable.get(key))
                     {
@@ -464,89 +467,44 @@ public class Main
 
                         if (beingUsed)
                         {
-                            newProductions.add(production);
+                            newSetTerms.add(production);
                         }
                     }
 
-                    if (newProductions.isEmpty())
-                    {removingkey.add(key);
+                    if (newSetTerms.isEmpty())
+                    {
+                        removingKey.add(key);
                     }
+
                     else
                     {
-                        cfgTable.put(key, newProductions);
+                        cfgTable.put(key, newSetTerms);
                     }
                 }
             }
 
-            for (String key : removingkey)
+            for (String key : removingKey)
             {
                 cfgTable.remove(key);
                 sVar.remove(key);
                 changesMade = true;
             }
+
         } while (changesMade);
     }
 
-/*    public static void uselessRuleStepThree()
+    // Prints the results into the text file
+    public static void printresults(Scanner inputReader, PrintWriter outputWriter)
     {
-        terminateVariable.clear();
 
-        for(Map.Entry<String, List<String>> entry : cfgTable.entrySet())
+        for(String key : sVar)
         {
-            if(entry.getValue().size() == 1)
-            {
-                String temp = entry.getKey();
+            List<String> cnfValue = new ArrayList<>(cfgTable.get(key));
 
-                if(temp.contains(temp.toUpperCase()))
-                {
-                    terminateVariable.add(entry.getKey());
-                    eliminationUseless();
-                }
-            }
+            outputWriter.println(key + "-" + String.join("|", cnfValue));
         }
 
-        //eliminationUseless();
+        inputReader.close();
+        outputWriter.close();
     }
-
-    public static void eliminationUseless()
-    {
-        List<String> foundNewState = new ArrayList<>();
-
-        for(String key : cfgTable.keySet())
-        {
-            List<String> newVarSets = new ArrayList<>();
-
-            for(String temp : cfgTable.get(key))
-            {
-                boolean checking = false;
-
-                for(char c : temp.toCharArray())
-                {
-                    if(terminateVariable.contains(String.valueOf(c)))
-                    {
-                        foundNewState.add(key);
-                        checking = true;
-                        break;
-                    }
-                }
-
-                if(!checking)
-                {
-                    newVarSets.add(temp);
-                }
-            }
-
-            cfgTable.put(key, newVarSets);
-        }
-
-        terminateVariable.addAll(foundNewState);
-
-        System.out.println("This is the value to terminate ");
-
-        for(String s : terminateVariable)
-        {
-            System.out.print(s + " ");
-        }
-    }*/
-
 }
